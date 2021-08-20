@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.apple',
     'corsheaders',
+    'users.apps.UsersConfig',
     'fcm_django',
     'django_admin_json_editor',
     'geolocation_fields',
