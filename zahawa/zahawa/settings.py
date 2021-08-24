@@ -175,16 +175,16 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/?verification=1'
 
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
-AWS_ACCESS_KEY_ID = ''
-AWS_SECRET_ACCESS_KEY = ''
-EMAIL_HOST_USER = ''
+AWS_ACCESS_KEY_ID = 'AKIA6GFB74FOPBO4MBEX'
+AWS_SECRET_ACCESS_KEY = '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'
+EMAIL_HOST_USER = 'no-reply@orderhomey.com'
 AWS_SES_REGION_NAME = 'me-south-1'
 AWS_SES_REGION_ENDPOINT = 'email.me-south-1.amazonaws.com'
 DEFAULT_FROM_EMAIL = 'no-reply@orderhomey.com'
 
 
 
-#AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 
 #CORS_ORIGIN_ALLOW_ALL = True

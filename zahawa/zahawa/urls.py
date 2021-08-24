@@ -25,7 +25,7 @@ from django.contrib.auth import views as auth_views
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-
+from social_login.views import FacebookLogin, GoogleLogin,AppleLogin
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -44,6 +44,11 @@ urlpatterns = [
     #admin route
     path('admin/', admin.site.urls),
     path('auth/', include('users.urls')),
+
+    # social login apis
+    path('rest-auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
+    path('rest-auth/google/', GoogleLogin.as_view(), name='google_login'),
+    path("rest-auth/apple/", AppleLogin.as_view(), name="apple-login"),
 
     # swagger apis
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
