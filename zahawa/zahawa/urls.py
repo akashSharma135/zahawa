@@ -44,6 +44,7 @@ urlpatterns = [
     #admin route
     path('admin/', admin.site.urls),
     path('auth/', include('users.urls')),
+    path('api/', include('api.urls')),
 
     # social login apis
     path('rest-auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
