@@ -21,8 +21,8 @@ ROOM_CHOICES = (
 
 
 class Room(models.Model):
-    name = models.CharField(blank=True, null=True, max_length=100)
-    subscribers = models.ManyToManyField(CustomUser)
+    room = models.CharField(blank=True, null=True, max_length=100)
+    subscribers=models.JSONField(blank=True, null=True,default=[], max_length=400)
     room_type = models.CharField(max_length=20, choices=ROOM_CHOICES, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
