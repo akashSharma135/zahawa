@@ -13,13 +13,12 @@ class RoomView(APIView):
         text=request.GET.get("filter")
         room=models.Room.objects.filter(room_type=text)
         count=room.count()
-        if room:
-            Serializers=serializers.RoomSerializer(room,many=True)
-            return Response({"Room_Type":text,
+        Serializers=serializers.RoomSerializer(room,many=True)
+        return Response({"Room_Type":text,
                             "count":count,
                             "result":Serializers.data}
             )
-        return Response("NOT_FOUND" , status=status.HTTP_404_NOT_FOUND)
+        
     
     def get_serializer(self):
         return serializers.RoomPostSerializer()
