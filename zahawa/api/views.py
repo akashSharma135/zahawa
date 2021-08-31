@@ -11,19 +11,23 @@ from . import models
 class RoomView(APIView):
     def get(self,request):
         text=request.GET.get("filter")
-        obj=models.Room.objects.filter(room_type=text)
-        if obj:
-            Serializers=serializers.RoomSerializer(obj,many=True)
-            return Response(Serializers.data[0])
-        return Response("NO_CONTENT" , status=status.HTTP_204_NO_CONTENT)
+        room=models.Room.objects.filter(room_type=text)
+        count=room.count()
+        if room:
+            Serializers=serializers.RoomSerializer(room,many=True)
+            return Response({"Room_Type":text,
+                            "count":count,
+                            "result":Serializers.data}
+            )
+        return Response("NOT_FOUND" , status=status.HTTP_404_NOT_FOUND)
     
     def get_serializer(self):
-        return serializers.RoomPOSTSerializer()
+        return serializers.RoomPostSerializer()
     
     def post(self,request):
-        Serializers=serializers.RoomPOSTSerializer(data=request.data)
+        Serializers=serializers.RoomPostSerializer(data=request.data)
         if Serializers.is_valid():
             Serializers.save()
             return Response(Serializers.data)
         else:
-            return Response(Serializers.errors,status=status.HTTP_204_NO_CONTENT)
+            return Response(Serializers.errors,status=status.HTTP_400_BAD_REQUEST)
