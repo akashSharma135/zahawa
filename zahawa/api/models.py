@@ -97,7 +97,7 @@ class VendorsReview(models.Model):
     rating = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(5.0)],
     )
-    description = models.CharField(max_length=250, null=True, blank=True)
+    description = models.CharField(max_length=250, null=True, blank=True)#change to review
 
 
 
@@ -153,5 +153,22 @@ class Team(models.Model):
     )
     name = models.CharField(blank=True, null=True, max_length=100)
     members = models.ManyToManyField(Member)
-    rank = models.PositiveIntegerField(default=0, blank=True)
-    created = models.DateTimeField(auto_now=True, blank=True)
+
+
+Proposals_STATUS= (
+    
+      ("Submitted", "Submitted"),
+    ("Offered", "Offered"),
+    ("Completed", "Completed"),
+    ("Cancelled", "Cancelled"),
+    
+    
+)
+
+class Proposals(models.Model):
+    user = models.ForeignKey(
+        CustomUser, blank=True, null=True, on_delete=models.CASCADE
+    )
+    Proposals_status = models.CharField(max_length=20, choices=Proposals_STATUS, null=True)
+    Proposals_type = models.CharField(max_length=20, choices=Proposals_STATUS, null=True)
+    title = models.TextField(blank=True, null=True, max_length=400)

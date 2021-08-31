@@ -18,6 +18,34 @@ from drf_yasg import openapi
 
 
 
+class VendorReviewView(APIView):
+    def get(self, request):
+        objects = models.VendorsReview.objects.all()
+        serializer = serializers.VendorsReviewserializer(objects, many=True)
+        return Response(serializer.data)
+    
+    
+    
+class VendorServiceView(APIView):
+    def get(self, request):
+        objects = models.Services.objects.all()
+        serializer = serializers.ServiceSerializer(objects, many=True)
+        return Response({
+            "Services":serializer.data}
+                        
+        )
+
+
+
+class VendorListView(APIView):
+    def get(self, request):
+        objects = models.Vendors.objects.all()
+        serializer = serializers.VendorListSerializer(objects, many=True)
+        return Response(serializer.data)
+
+
+
+
 class EventsTypeView(APIView):
     def get(self, request):
         objects = models.Events.objects.all()
