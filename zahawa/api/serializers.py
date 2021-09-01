@@ -60,7 +60,6 @@ class VendorListSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         rating = models.VendorsReview.objects.values_list("rating",flat=True,
         ).filter( vendor=obj.id)
-        print("#@#@#@%#@",rating)
         return rating
     def get_reviews(self, obj):
         description = models.VendorsReview.objects.values_list("description",
@@ -69,12 +68,10 @@ class VendorListSerializer(serializers.ModelSerializer):
     
     def get_priject_images(self, obj):
         priject_images = models.Services.objects.filter(vendor_id=obj.id).values_list("service_image",flat=True)
-        print("^^#@$#^@#@#@",priject_images)
         return priject_images
     
     def get_user_image(self, obj):
         user_images = models.CustomUser.objects.filter(id=obj.id).values_list("profile_picture",flat=True)
-        print("^^#@$#^@#@#@",user_images)
         return user_images
     
 class EventsSerializer(serializers.ModelSerializer):
