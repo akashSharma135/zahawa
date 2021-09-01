@@ -95,13 +95,19 @@ ASGI_APPLICATION = 'zahawa.routing.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'zahawa',
+#         'USER': 'cisoadmin1',
+#         'PASSWORD': 'cisopassword',
+#         'HOST': 'localhost'
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'zahawa',
-        'USER': 'cisoadmin1',
-        'PASSWORD': 'cisopassword',
-        'HOST': 'localhost'
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 

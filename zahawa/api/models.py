@@ -56,6 +56,8 @@ class Order(models.Model):
     delivery_address = models.CharField(blank=True, null=True, max_length=100)
     total_amount = models.PositiveIntegerField(default=0, blank=True)
     taxes = models.PositiveIntegerField(default=0, blank=True)
+    create = models.DateTimeField(auto_now=True, blank=True, null=True, max_length=100)
+    
     # grand_total=models.PositiveIntegerField()
 
 
@@ -172,3 +174,6 @@ class Proposals(models.Model):
     Proposals_status = models.CharField(max_length=20, choices=Proposals_STATUS, null=True)
     Proposals_type = models.CharField(max_length=20, choices=Proposals_STATUS, null=True)
     title = models.TextField(blank=True, null=True, max_length=400)
+    created = models.DateTimeField(auto_now_add=True)
+    
+    

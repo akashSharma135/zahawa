@@ -18,19 +18,65 @@ from drf_yasg import openapi
 
 
 
+
+class PropsalViewTwo(APIView):
+    def get(self, request,pk):
+        Proposals_type=models.Services.objects.filter(vendor_id=pk).values_list("service_image")
+        return Response(Proposals_type)
+
+
+
+class PropsalView(APIView):
+    def get(self, request):
+        get_data=request.query_params
+        search_text = get_data.get("filter")
+        if search_text:
+            Proposals_type=models.Proposals.objects.filter(Proposals_type=search_text)
+            count=Proposals_type.count()
+            serializer = serializers.ProposalUserSerializer(Proposals_type, many=True)
+            return Response( {
+                    "proposals":search_text,
+                    "count":count,
+                    "result":serializer.data})
+         
+        else:
+            search_text = get_data.get("user_id")
+            Proposals=models.Proposals.objects.filter(user_id=search_text)
+            order=models.Order.objects.filter(user_id=search_text)
+            services=models.Vendors.objects.filter(user_id=search_text)
+            serializer1 = serializers.ProposalUserSerializer(Proposals, many=True)
+            serializer2 = serializers.OrderUserSerializer(order, many=True)
+            #serializer3 = serializers.VendorListSerializer(services, many=True)
+            response=serializer1.data+serializer2.data
+            return Response(response)
+               
+
 class VendorReviewView(APIView):
     def get(self, request):
-        objects = models.VendorsReview.objects.all()
+        get_data=request.query_params
+        ID = get_data.get("vendor_id")
+        objects = models.VendorsReview.objects.filter(vendor_id=ID)
         serializer = serializers.VendorsReviewserializer(objects, many=True)
-        return Response(serializer.data)
+        return Response({
+                         "Vandor_id":ID,
+                         "reviews":serializer.data})
     
-    
-    
-class VendorServiceView(APIView):
+class ServiceListView(APIView):
     def get(self, request):
         objects = models.Services.objects.all()
         serializer = serializers.ServiceSerializer(objects, many=True)
+        return Response(serializer.data)
+    
+
+    
+class VendorServiceView(APIView):
+    def get(self, request):
+        get_data=request.query_params
+        ID = get_data.get("vendor_id")
+        objects = models.Services.objects.filter(vendor_id=ID)
+        serializer = serializers.ServiceSerializer(objects, many=True)
         return Response({
+            "vendor_id":ID,
             "Services":serializer.data}
                         
         )
