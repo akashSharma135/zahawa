@@ -99,7 +99,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'zahawa',
-        'USER': 'cisoadmin1',
+        'USER': 'cisoadmin',
         'PASSWORD': 'cisopassword',
         'HOST': 'localhost'
     }
