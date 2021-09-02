@@ -14,5 +14,9 @@ urlpatterns = [
     path("services/", views.ServiceListView.as_view()),
     path("search/", views.ApiSearchView.as_view()),
     path("profile/loyaltyprogram/Search/", views.loyaltySearchView.as_view()),
+    path("categories/", views.CategoriesView.as_view()),
+    path("categories/details/<int:pk>/", views.CategoriesDetailsView.as_view()),
+    path("vendor_type/", views.VendorTypeView.as_view()),
+    
 ]
 
