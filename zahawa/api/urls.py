@@ -13,5 +13,6 @@ urlpatterns = [
     path("Propsal/search/", views.PropsalView.as_view()),
     path("services/", views.ServiceListView.as_view()),
     path("search/", views.ApiSearchView.as_view()),
+    path("profile/loyaltyprogram/Search/", views.loyaltySearchView.as_view()),
 ]
 
