@@ -20,13 +20,15 @@ from django.contrib.auth.hashers import make_password
 from random import randint
 from rest_framework import permissions
 
+
 def random_with_N_digits():
-    range_start = 10**(6-1)
-    range_end = (10**6)-1
+    range_start = 10 ** (6 - 1)
+    range_end = (10 ** 6) - 1
     return randint(range_start, range_end)
 
 
 # --------------------------------User Register View--------------------------------
+
 
 class UserRegister(APIView):
     def get_serializer(self):
@@ -74,7 +76,7 @@ class UserRegister(APIView):
                     if user_check:
                         user_check.update(code=otp)
                     else:
-                        models.Otp.objects.create(email=email,code=otp)
+                        models.Otp.objects.create(email=email, code=otp)
 
                 except BadHeaderError:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -88,8 +90,6 @@ class UserRegister(APIView):
         else:
             data = {"error": True, "errors": serializer.errors}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class EmailVerification(APIView):
@@ -154,7 +154,6 @@ class UserAuth(APIView):
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
 
-
 # --------------------------------User Password Reset View--------------------------------
 
 
@@ -204,14 +203,10 @@ class UserPasswordReset(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class UserPasswordUpdate(APIView):
-
     def get_serializer(self):
         properties = {
-            "email": openapi.Schema(
-                type=openapi.TYPE_STRING, description="string"
-            ),
+            "email": openapi.Schema(type=openapi.TYPE_STRING, description="string"),
             "old_password": openapi.Schema(
                 type=openapi.TYPE_STRING, description="string"
             ),
@@ -247,7 +242,6 @@ class UserPasswordUpdate(APIView):
         userDetails.save()
         data = {"error": False, "message": "Password changed successfully"}
         return Response(data, status=status.HTTP_200_OK)
-
 
 
 # --------------------------------User Change Password View--------------------------------
@@ -301,7 +295,6 @@ class ChangePassword(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-
 # --------------------------------Get User Data View--------------------------------
 
 
@@ -327,4 +320,3 @@ class User(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

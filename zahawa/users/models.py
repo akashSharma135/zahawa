@@ -5,6 +5,7 @@ from .managers import CustomUserManager
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.postgres.fields import JSONField
+from geolocation_fields.models import fields
 # Model of Users
 
 
@@ -12,7 +13,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_("email address"), unique=True, blank=True, null=True)
     name = models.CharField(blank=True, null=True, max_length=100)
     profile_picture = models.ImageField(
-        upload_to=None, null=True, blank=True, default="media/None/default.png"
+        upload_to=None, null=True, blank=True, default="media/default.png"
     )
 
     USERNAME_FIELD = "email"
@@ -20,6 +21,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
     
+    points = fields.PointField(blank=True, null=True, verbose_name="Point")
     phone_number = models.CharField(blank=True, null=True, max_length=100)
     verified = models.BooleanField(default=False)
     loyalty_program = models.CharField(blank=True, null=True, max_length=400)    
