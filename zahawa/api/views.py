@@ -19,11 +19,29 @@ from drf_yasg import openapi
 
 
 
-class PropsalViewTwo(APIView):
-    def get(self, request,pk):
-        Proposals_type=models.Services.objects.filter(vendor_id=pk).values_list("service_image")
-        return Response(Proposals_type)
-
+class ApiSearchView(APIView):
+    def get(self, request):
+        name=request.GET.get("name")
+        print("#######@#@#@",name)
+        description=request.GET.get("description")
+        user_id=request.GET.get("user_id")
+        
+        objects1=models.Vendors.objects.filter(name__contains=name)
+        if objects1:                               
+            Serializers=serializers.Vendors(objects1,many=True)
+            return Response(Serializers.data)    
+        
+        # vendor_id=request.GET.get("vendor_id")
+        # service_name=request.GET.get("service_name")
+        
+        # objects2=models.Services.objects.filter(
+        #         vendor_id=vendor_id).filter(
+        #             service_name__contains=service_name) 
+        
+        if objects2:
+            Serializers=serializers.Services(objects2,many=True)
+            return Response(Serializers.data)
+            
 
 
 class PropsalView(APIView):
@@ -49,7 +67,14 @@ class PropsalView(APIView):
             #serializer3 = serializers.VendorListSerializer(services, many=True)
             response=serializer1.data+serializer2.data
             return Response(response)
-               
+    def post(self,request):
+        Serializers =serializers.ProposalPostSerializer(data=request.data)
+        if Serializers.is_valid():
+            Serializers.save()
+            return Response(Serializers.data)
+        return Response(Serializers.errors)
+
+
 
 class VendorReviewView(APIView):
     def get(self, request):

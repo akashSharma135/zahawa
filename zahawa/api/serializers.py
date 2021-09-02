@@ -6,6 +6,16 @@ from rest_framework.response import Response
 
 
 
+class Vendors(serializers.ModelSerializer):
+    class Meta:
+        model = models.Vendors
+        fields = "__all__"
+
+class Services(serializers.ModelSerializer):
+    class Meta:
+        model = models.Services
+        fields = "__all__"
+
 class OrderUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Order

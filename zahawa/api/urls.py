@@ -12,5 +12,6 @@ urlpatterns = [
     path("Vendor/review/", views.VendorReviewView.as_view()),
     path("Propsal/search/", views.PropsalView.as_view()),
     path("services/", views.ServiceListView.as_view()),
+    path("search/", views.ApiSearchView.as_view()),
 ]
 
