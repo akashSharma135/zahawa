@@ -72,13 +72,17 @@ class Events(models.Model):
 
 
 
-
+class Categories(models.Model):
+    name = models.CharField(blank=True, null=True, max_length=100)
+    image=models.ImageField(upload_to=None, null=True, blank=True,default="media/default.png")
+    #vendor=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
 class Vendors(models.Model):
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True)
     name = models.CharField(blank=True, null=True, max_length=100)
     image = models.ImageField(null=True, blank=True, default="media/default.png")
     description = models.TextField(blank=True, null=True, max_length=400)
     is_favorite = models.BooleanField(default=False, null=True, blank=True)
+    categories=models.ForeignKey(Categories,null=True,blank=True, on_delete=models.CASCADE)
     
     # project_gallery = models.ForeignKey(
     #     Image,
@@ -88,9 +92,7 @@ class Vendors(models.Model):
     #     on_delete=models.CASCADE,
     # )  
     
-class Categories(models.Model):
-    name = models.CharField(blank=True, null=True, max_length=100)
-    
+
     
 class ImageList(models.Model):
     image=models.ImageField(

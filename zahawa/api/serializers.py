@@ -5,7 +5,23 @@ from rest_framework.response import Response
 
 
 
-
+class DetailsSerializers(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+    Categorie = serializers.SerializerMethodField()
+    class Meta:
+        model = models.Vendors
+        fields =['id','image','name','Categorie','rating']
+    def get_rating(self,obj):
+        rating=models.VendorsReview.objects.filter(vendor=obj).values_list("rating",flat=True)
+        return rating
+    def get_Categorie(self,obj):
+        Categorie=models.Categories.objects.filter(name=obj.categories.name).values_list("name",flat=True)
+        return Categorie
+class CategoriesSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = models.Categories
+        fields =['id','image','name']
+        
         
 class PackagesSerializers(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -21,6 +37,11 @@ class VendorsSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.Vendors
         fields = "__all__"
+
+class VendorsTypeSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = models.Vendors
+        fields = ["id","image","name",]
 
 class ServicesSerializers(serializers.ModelSerializer):
     class Meta:

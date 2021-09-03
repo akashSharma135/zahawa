@@ -18,6 +18,32 @@ from drf_yasg import openapi
 
 
 
+
+class VendorTypeView(APIView):
+    def get(self, request):
+        objects = models.Vendors.objects.all()  
+        serializer= serializers.VendorsTypeSerializers(objects,many=True)
+        return Response({
+            "result":serializer.data
+            })
+    
+#view for list all Categories 
+class CategoriesView(APIView):
+    def get(self, request):
+        objects = models.Categories.objects.all()  
+        serializer= serializers.CategoriesSerializers(objects,many=True)
+        return Response({
+            "Categories":serializer.data
+            })
+    
+class CategoriesDetailsView(APIView):
+    def get(self, request,pk):
+        objects = models.Vendors.objects.filter(categories=pk)
+        serializer= serializers.DetailsSerializers(objects,many=True)
+        return Response({"Categorie_id":pk,
+                         "result":serializer.data})
+        
+
 #view for loyaltySearch by keywords and count
 class loyaltySearchView(APIView):
     def get(self, request):
