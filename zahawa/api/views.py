@@ -17,7 +17,69 @@ import coreapi
 from drf_yasg import openapi
 
 
+class UserCartView(APIView):
+    def post(self, request):
+        serializer= serializers.UserCartSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
 
+class OrderCartView(APIView):
+    def post(self, request):
+        serializer= serializers.OrderCartSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+        
+
+
+#search order by keyword
+class OrderSearchView(APIView):
+    def get(self, request):
+        keyword=request.GET.get("keyword")
+        print("@@#@#@#@#",keyword)
+        if keyword=="Active":
+            objects=models.Order.objects.filter(order_Type__contains=keyword)
+            serializer =serializers.OrderSerializer(objects,many=True)
+            return Response({"Keyword":keyword,
+                            "count":objects.count(),
+                            "result":serializer.data})
+        if keyword=="Completed":
+            objects=models.Order.objects.filter(order_Type__contains=Completed)
+            serializer =serializers.OrderSerializer(objects,many=True)
+            return Response({"Keyword":keyword,
+                            "count":objects.count(),
+                            "result":serializer.data})
+
+        else:
+            objects=models.Order.objects.filter(Q(order_Type="Active")|Q(order_Type="Completed"))
+            serializer =serializers.OrderSerializer(objects,many=True)
+            return Response(serializer.data)
+            
+#all orders detail view
+class OrderDetailsView(APIView):
+    def get(self, request):
+        objects = models.Order.objects.all()
+        # objects = models.Order.objects.filter(user=request.user)
+        serializer= serializers.OrderSerializer(objects,many=True)
+        return Response(serializer.data)
+
+#order by user id view
+class UserOrderDView(APIView):
+    def get(self, request,pk):
+        objects = models.Order.objects.filter(user=pk)
+        # objects = models.Order.objects.filter(user=request.user)
+        serializer= serializers.OrderSerializer(objects,many=True)
+        return Response(serializer.data)
+    def post(self, request):
+        serializer= serializers.postOrderSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+        
 
 class VendorTypeView(APIView):
     def get(self, request):
@@ -43,7 +105,7 @@ class CategoriesDetailsView(APIView):
         return Response({"Categorie_id":pk,
                          "result":serializer.data})
         
-
+    
 #view for loyaltySearch by keywords and count
 class loyaltySearchView(APIView):
     def get(self, request):
@@ -132,14 +194,20 @@ class PropsalView(APIView):
 
 class VendorReviewView(APIView):
     def get(self, request):
+        
         get_data=request.query_params
         ID = get_data.get("vendor_id")
-        objects = models.VendorsReview.objects.filter(vendor_id=ID)
-        serializer = serializers.VendorsReviewserializer(objects, many=True)
-        return Response({
-                         "Vandor_id":ID,
-                         "reviews":serializer.data})
-    
+        if ID:
+            objects = models.VendorsReview.objects.filter(vendor_id=ID)
+            serializer = serializers.VendorsReviewserializer(objects, many=True)
+            return Response({
+                            "Vandor_id":ID,
+                            "reviews":serializer.data})
+        else:
+            objects = models.VendorsReview.objects.all()
+            serializer = serializers.VendorsReviewserializer(objects, many=True)
+            return Response({"reviews":serializer.data})
+            
 class ServiceListView(APIView):
     def get(self, request):
         objects = models.Services.objects.all()
@@ -148,17 +216,21 @@ class ServiceListView(APIView):
     
 
     
-class VendorServiceView(APIView):
-    def get(self, request):
-        get_data=request.query_params
-        ID = get_data.get("vendor_id")
-        objects = models.Services.objects.filter(vendor_id=ID)
-        serializer = serializers.ServiceSerializer(objects, many=True)
-        return Response({
-            "vendor_id":ID,
-            "Services":serializer.data}
+#----------Have to fix-----------------   
+#-----------vendor_id-----------#
+        #----------------#
+
+# class VendorServiceView(APIView):
+#     def get(self, request):
+#         get_data=request.query_params
+#         ID = get_data.get("vendor_id")
+#         objects = models.Services.objects.filter(vendor_id=ID)
+#         serializer = serializers.ServiceSerializer(objects, many=True)
+#         return Response({
+#             "vendor_id":ID,
+#             "Services":serializer.data}
                         
-        )
+#         )
 
 
 
