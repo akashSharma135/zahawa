@@ -6,6 +6,17 @@ from rest_framework.response import Response
 
 
 
+        
+class PackagesSerializers(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = models.Packages
+        fields = "__all__"
+        
+    def get_image(self, obj):
+        image = models.ImageList.objects.filter(vendor_id=obj).values_list("image",flat=True)
+        return image
+
 class VendorsSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.Vendors
@@ -56,7 +67,7 @@ class VendorListSerializer(serializers.ModelSerializer):
     avg_rating = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
     reviews = serializers.SerializerMethodField()
-    priject_images=serializers.SerializerMethodField()
+    project_images=serializers.SerializerMethodField()
     user_image=serializers.SerializerMethodField()
     class Meta:
         model = models.Vendors
@@ -76,9 +87,9 @@ class VendorListSerializer(serializers.ModelSerializer):
         flat=True).filter( vendor=obj.id)
         return description
     
-    def get_priject_images(self, obj):
-        priject_images = models.Services.objects.filter(vendor_id=obj.id).values_list("service_image",flat=True)
-        return priject_images
+    def get_project_images(self, obj):
+        project_images = models.ImageList.objects.filter(vendor_id=obj).values_list("image",flat=True)
+        return project_images
     
     def get_user_image(self, obj):
         user_images = models.CustomUser.objects.filter(id=obj.id).values_list("profile_picture",flat=True)
@@ -94,7 +105,7 @@ class EventsSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Room
-        fields =['id','room',]
+        fields =['id','room','room_type']
    
 class RoomPostSerializer(serializers.ModelSerializer):
      class Meta:

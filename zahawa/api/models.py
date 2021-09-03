@@ -4,10 +4,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 # Create your models here.
 
 
-class Image(models.Model):
-    models.ImageField(
-        upload_to=None, null=True, blank=True, default="media/default.png"
-    )
+
 
 
 ROOM_CHOICES = (
@@ -74,8 +71,6 @@ class Events(models.Model):
     image = models.ImageField(null=True, blank=True, default="media/default.png")
 
 
-class Categories(models.Model):
-    name = models.CharField(blank=True, null=True, max_length=100)
 
 
 class Vendors(models.Model):
@@ -84,14 +79,24 @@ class Vendors(models.Model):
     image = models.ImageField(null=True, blank=True, default="media/default.png")
     description = models.TextField(blank=True, null=True, max_length=400)
     is_favorite = models.BooleanField(default=False, null=True, blank=True)
-    project_gallery = models.ForeignKey(
-        Image,
-        null=True,
-        blank=True,
-        default="media/default.png",
-        on_delete=models.CASCADE,
-    )  
-
+    
+    # project_gallery = models.ForeignKey(
+    #     Image,
+    #     null=True,
+    #     blank=True,
+    #     default="media/default.png",
+    #     on_delete=models.CASCADE,
+    # )  
+    
+class Categories(models.Model):
+    name = models.CharField(blank=True, null=True, max_length=100)
+    
+    
+class ImageList(models.Model):
+    image=models.ImageField(
+        upload_to=None, null=True, blank=True, default="media/default.png"
+    )
+    vendor_id=models.ForeignKey(Vendors,null=True,blank=True,on_delete=models.CASCADE)
 
 class VendorsReview(models.Model):
     vendor = models.ForeignKey(Vendors, on_delete=models.CASCADE)
@@ -110,7 +115,14 @@ class Services(models.Model):
 
     service_minAmount = models.PositiveIntegerField(default=0)
     service_maxAmount = models.PositiveIntegerField(default=0)
-
+    
+class Packages(models.Model):
+    vendor_id = models.ForeignKey(Vendors, on_delete=models.CASCADE)
+    packages_type=models.CharField(blank=True, null=True, max_length=100)
+    duration=models.TimeField()
+    amount=models.PositiveIntegerField(default=0, blank=True)
+    
+    
 
 class ServicesReview(models.Model):
     services = models.ForeignKey(Services, on_delete=models.CASCADE)
@@ -135,6 +147,17 @@ class Cart(models.Model):
     )
     cart_createdDate = models.DateField(blank=True, null=True, max_length=100)
     cart_createdTime = models.TimeField()
+    
+class CreateCart(models.Model):
+    cart = models.ForeignKey(
+        Cart, blank=True, null=True, on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        Order,null=True, on_delete=models.CASCADE)
+    
+    
+    
+    
+    
 
 
 class Member(models.Model):

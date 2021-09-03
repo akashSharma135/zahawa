@@ -18,6 +18,28 @@ from drf_yasg import openapi
 
 
 
+#view for loyaltySearch by keywords and count
+class loyaltySearchView(APIView):
+    def get(self, request):
+        room=request.GET.get("room")
+        room_type=request.GET.get("room_type")
+        if room: 
+            objects=models.Room.objects.filter(room__contains=room)
+            Count=objects.count()
+            Serializers=serializers.RoomSerializer(objects,many=True)
+            return Response({
+                "keyword":room,
+                "cont":Count,
+                "result":Serializers.data})    
+        if room_type:
+            objects=models.Room.objects.filter(room_type__contains=room_type)
+            Count=objects.count()
+            Serializers=serializers.RoomSerializer(objects,many=True)
+            return Response({
+                    "keyword":room_type,
+                    "cont":Count,
+                    "result":Serializers.data}) 
+
 
 class ApiSearchView(APIView):
     def get(self, request):
@@ -49,11 +71,7 @@ class ApiSearchView(APIView):
                         "cont":Count,
                         "result":Serializers.data})  
         
-           
-            
-            
-    
-
+        
 class PropsalView(APIView):
     def get(self, request):
         get_data=request.query_params
