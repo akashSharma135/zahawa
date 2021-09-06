@@ -18,6 +18,8 @@ from drf_yasg import openapi
 
 
 class UserCartView(APIView):
+    def get_serializer(self):
+        return serializers.UserCartSerializer()
     def post(self, request):
         serializer= serializers.UserCartSerializer(data=request.data)
         if serializer.is_valid():
@@ -25,7 +27,10 @@ class UserCartView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors)
 
+
 class OrderCartView(APIView):
+    def get_serializer(self):
+        return serializers.OrderCartSerializer()
     def post(self, request):
         serializer= serializers.OrderCartSerializer(data=request.data)
         if serializer.is_valid():
@@ -34,11 +39,26 @@ class OrderCartView(APIView):
         return Response(serializer.errors)
         
 
+
+
+class OrderSearchViewFilterBackend(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="keyword",
+                location="query",
+                required=False,
+                type="string",
+                description="send search keyword",
+            )
+        ]
+
+
 #search order by keyword
 class OrderSearchView(APIView):
+    filter_backends = (OrderSearchViewFilterBackend,)
     def get(self, request):
         keyword=request.GET.get("keyword")
-        print("@@#@#@#@#",keyword)
         if keyword=="Active":
             objects=models.Order.objects.filter(order_Type__contains=keyword)
             serializer =serializers.OrderSerializer(objects,many=True)
@@ -72,6 +92,10 @@ class UserOrderDView(APIView):
         # objects = models.Order.objects.filter(user=request.user)
         serializer= serializers.OrderSerializer(objects,many=True)
         return Response(serializer.data)
+
+    def get_serializer(self):
+        return serializers.postOrderSerializer()
+
     def post(self, request):
         serializer= serializers.postOrderSerializer(data=request.data)
         if serializer.is_valid():
@@ -105,8 +129,30 @@ class CategoriesDetailsView(APIView):
                          "result":serializer.data})
         
     
+
+class loyaltySearchViewFilterBackend(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="room",
+                location="query",
+                required=False,
+                type="string",
+                description="send search keyword",
+            ),
+            coreapi.Field(
+                name="room_type",
+                location="query",
+                required=False,
+                type="string",
+                description="send description keyword",
+            )
+        ]
+
+
 #view for loyaltySearch by keywords and count
 class loyaltySearchView(APIView):
+    filter_backends = (loyaltySearchViewFilterBackend,)
     def get(self, request):
         room=request.GET.get("room")
         room_type=request.GET.get("room_type")
@@ -128,7 +174,28 @@ class loyaltySearchView(APIView):
                     "result":Serializers.data}) 
 
 
+class ApiSearchViewFilterBackend(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="name",
+                location="query",
+                required=False,
+                type="string",
+                description="send search keyword",
+            ),
+            coreapi.Field(
+                name="description",
+                location="query",
+                required=False,
+                type="string",
+                description="send description keyword",
+            )
+        ]
+
+
 class ApiSearchView(APIView):
+    filter_backends = (ApiSearchViewFilterBackend,)
     def get(self, request):
         name=request.GET.get("name")
         description=request.GET.get("description")
@@ -158,8 +225,31 @@ class ApiSearchView(APIView):
                         "cont":Count,
                         "result":Serializers.data})  
         
-        
+
+
+class PropsalViewFilterBackend(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="filter",
+                location="query",
+                required=False,
+                type="string",
+                description="send search keyword",
+            ),
+            coreapi.Field(
+                name="user_id",
+                location="query",
+                required=False,
+                type="string",
+                description="send search keyword",
+            )
+        ]
+
+
 class PropsalView(APIView):
+    filter_backends = (PropsalViewFilterBackend,)
+    
     def get(self, request):
         get_data=request.query_params
         search_text = get_data.get("filter")
@@ -179,21 +269,36 @@ class PropsalView(APIView):
             services=models.Vendors.objects.filter(user_id=search_text)
             serializer1 = serializers.ProposalUserSerializer(Proposals, many=True)
             serializer2 = serializers.OrderUserSerializer(order, many=True)
-            #serializer3 = serializers.VendorListSerializer(services, many=True)
             response=serializer1.data+serializer2.data
             return Response(response)
+
+    def get_serializer(self):
+        return serializers.ProposalUserSerializer()
+
     def post(self,request):
-        Serializers =serializers.ProposalPostSerializer(data=request.data)
+        Serializers =serializers.ProposalUserSerializer(data=request.data)
         if Serializers.is_valid():
             Serializers.save()
             return Response(Serializers.data)
         return Response(Serializers.errors)
 
 
+class VendorReviewFilterBackend(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="vendor_id",
+                location="query",
+                required=False,
+                type="string",
+                description="send search keyword",
+            )
+        ]
+
 
 class VendorReviewView(APIView):
     def get(self, request):
-        
+        filter_backends = (VendorReviewFilterBackend,)
         get_data=request.query_params
         ID = get_data.get("vendor_id")
         if ID:
@@ -249,15 +354,28 @@ class EventsTypeView(APIView):
         return Response(serializer.data)
 
 
+class RoomFilterBackend(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="filter",
+                location="query",
+                required=True,
+                type="string",
+                description="send search keyword",
+            )
+        ]
+
 
 # Create your views here.
 class RoomView(APIView):
+    filter_backends = (RoomFilterBackend,)
     def get(self,request):
         text=request.GET.get("filter")
         room=models.Room.objects.filter(room_type=text)
         count=room.count()
         Serializers=serializers.RoomSerializer(room,many=True)
-        return Response({"Room_Type":text,
+        return Response({"room_type":text,
                             "count":count,
                             "result":Serializers.data}
             )
