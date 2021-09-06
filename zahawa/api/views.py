@@ -34,7 +34,6 @@ class OrderCartView(APIView):
         return Response(serializer.errors)
         
 
-
 #search order by keyword
 class OrderSearchView(APIView):
     def get(self, request):
