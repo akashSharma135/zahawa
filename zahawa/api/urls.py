@@ -19,10 +19,11 @@ urlpatterns = [
     path("vendor_type/", views.VendorTypeView.as_view()),
     path("OrderDetails/", views.OrderDetailsView.as_view()),
     path("OrderSearch/", views.OrderSearchView.as_view()),
-    path("UserOrder/<int:pk>/", views.UserOrderDView.as_view()),
+    # path("UserOrder/<int:pk>/", views.UserOrderDView.as_view()),
     path("UserOrder/", views.UserOrderDView.as_view()),
     path("Cart/", views.UserCartView.as_view()),
     path("CartOrder/", views.OrderCartView.as_view()),
+    path("TeamView/<int:pk>/", views.TeamView.as_view()),
     
 ]
 

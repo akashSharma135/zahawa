@@ -17,4 +17,6 @@ admin.site.register(models.Product)
 admin.site.register(models.CustomUser)
 admin.site.register(models.CreateCart)
 admin.site.register(models.Cart)
+admin.site.register(models.Member)
+admin.site.register(models.Team)
 

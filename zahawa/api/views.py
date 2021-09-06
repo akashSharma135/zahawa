@@ -15,6 +15,94 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework.filters import BaseFilterBackend
 import coreapi
 from drf_yasg import openapi
+from django.shortcuts import render, get_object_or_404
+
+
+
+class SearchFilterOrder(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="Keyword", location="query", required=False, type="string"
+            )
+        ]
+class SearchFilterOrderView(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="user_id", location="query", required=False, type="id"
+            )
+        ]
+
+
+class SearchFilterVendor(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="vendor_id", location="query", required=False, type="id"
+            )
+        ]
+class SearchFilterloyalty(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="room ", location="query", required=False, type="id"
+            ),
+               coreapi.Field(
+                name="room_type ", location="query", required=False, type="id"
+            )
+        
+
+        ]
+class SearchFilterApiSearch(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="name ", location="query", required=False, type="id"
+            ),
+               coreapi.Field(
+                name="description ", location="query", required=False, type="id"
+            ),
+               coreapi.Field(
+                name="service_name ", location="query", required=False, type="id"
+            )
+        
+
+        ]
+
+
+
+
+
+class TeamView(APIView):
+    def get(self, request,pk):
+        objects= models.Team.objects.filter(pk=pk)
+        serializer= serializers.TeamListSerializer(objects,many=True)
+        return Response(serializer.data)
+    
+    
+    def get_serializer(self):
+        properties = {
+            "thumb": openapi.Schema(
+                type=openapi.TYPE_STRING, description="Image"
+            ),
+            "name": openapi.Schema(
+                type=openapi.TYPE_STRING, description="string"
+            )
+        }
+        return_openapi_schema = openapi.Schema(
+            type=openapi.TYPE_OBJECT, properties=properties
+        )
+        return return_openapi_schema
+    def patch(self, request,pk):
+        objects = get_object_or_404(
+            models.Team.objects.filter(pk=pk))
+        serializer = serializers.TeamListSerializer(
+            objects, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
 
 
 class UserCartView(APIView):
@@ -87,8 +175,10 @@ class OrderDetailsView(APIView):
 
 #order by user id view
 class UserOrderDView(APIView):
-    def get(self, request,pk):
-        objects = models.Order.objects.filter(user=pk)
+    filter_backends = (SearchFilterOrderView,)
+    def get(self, request):
+        ID=request.GET.get("user_id")
+        objects = models.Order.objects.filter(user=ID)
         # objects = models.Order.objects.filter(user=request.user)
         serializer= serializers.OrderSerializer(objects,many=True)
         return Response(serializer.data)
@@ -249,10 +339,9 @@ class PropsalViewFilterBackend(BaseFilterBackend):
 
 class PropsalView(APIView):
     filter_backends = (PropsalViewFilterBackend,)
-    
     def get(self, request):
         get_data=request.query_params
-        search_text = get_data.get("filter")
+        search_text = get_data.get("keyword")
         if search_text:
             Proposals_type=models.Proposals.objects.filter(Proposals_type=search_text)
             count=Proposals_type.count()
@@ -297,6 +386,7 @@ class VendorReviewFilterBackend(BaseFilterBackend):
 
 
 class VendorReviewView(APIView):
+    filter_backends = (SearchFilterVendor,)
     def get(self, request):
         filter_backends = (VendorReviewFilterBackend,)
         get_data=request.query_params
@@ -371,7 +461,7 @@ class RoomFilterBackend(BaseFilterBackend):
 class RoomView(APIView):
     filter_backends = (RoomFilterBackend,)
     def get(self,request):
-        text=request.GET.get("filter")
+        text=request.GET.get("keyword")
         room=models.Room.objects.filter(room_type=text)
         count=room.count()
         Serializers=serializers.RoomSerializer(room,many=True)
