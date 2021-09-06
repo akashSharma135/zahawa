@@ -108,6 +108,14 @@ class OrderUserSerializer(serializers.ModelSerializer):
         fields = ['event_title','event_type','event_date','event_time','event_location','total_amount']
 #######-----------------------------
 
+
+
+class ProposalUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Proposals
+        fields = ['user','Proposals_type','Proposals_status','title','created',]
+
+
 class ProposalUserSerializer(serializers.ModelSerializer):
     service_name= serializers.SerializerMethodField()
     class Meta:
