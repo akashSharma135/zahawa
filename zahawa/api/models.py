@@ -182,16 +182,6 @@ class CreateCart(models.Model):
     
 
 
-class Member(models.Model):
-    members = models.ForeignKey(
-        CustomUser, blank=True, null=True, on_delete=models.CASCADE
-    )
-    # profile_picture = models.ImageField(
-    #     upload_to=None, null=True, blank=True, default="media/None/default.png"
-    # )
-    captain = models.CharField(blank=True, null=True, max_length=100)
-    vice_captain = models.CharField(blank=True, null=True, max_length=100)
-    create = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
 class Team(models.Model):
@@ -199,7 +189,20 @@ class Team(models.Model):
         upload_to=None, null=True, blank=True, default="media/default.png"
     )
     name = models.CharField(blank=True, null=True, max_length=100)
-    members = models.ManyToManyField(Member)
+    
+class Member(models.Model):
+    members = models.ForeignKey(
+        CustomUser, blank=True, null=True, on_delete=models.CASCADE
+    )
+    profile_picture = models.ImageField(
+        upload_to=None, null=True, blank=True, default="media/None/default.png"
+    )
+    captain = models.CharField(blank=True, null=True, max_length=100)
+    vice_captain = models.CharField(blank=True, null=True, max_length=100)
+    team = models.ForeignKey(
+        Team, blank=True, null=True, on_delete=models.CASCADE
+    )
+    create = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
 Proposals_STATUS= (

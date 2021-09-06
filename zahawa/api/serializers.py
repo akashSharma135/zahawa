@@ -5,7 +5,21 @@ from django.db.models import F,FloatField ,Sum ,Avg
 
 
 
-
+class MemberListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Member
+        fields ='__all__'
+        
+class TeamListSerializer(serializers.ModelSerializer):
+    members=serializers.SerializerMethodField()
+    class Meta:
+        model = models.Team
+        fields =['id','thumb','name','members',]
+    def get_members(self,obj):
+        members=models.Member.objects.filter(team=obj)
+        serializer= MemberListSerializer(members,many=True)
+        return serializer.data
+        
 
 class UserCartSerializer(serializers.ModelSerializer):
     class Meta:
