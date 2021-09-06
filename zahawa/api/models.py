@@ -38,24 +38,7 @@ STATUS_CHOICES = (
 )
 
 
-class Order(models.Model):
-    # order
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    order_Type = models.CharField(max_length=20, choices=ORDER_CHOICES, null=True)
-    order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, null=True)
-    order_datetime = models.DateTimeField(blank=True, null=True, max_length=100)
 
-    event_title = models.CharField(blank=True, null=True, max_length=100)
-    event_type = models.CharField(blank=True, null=True, max_length=100)
-    event_date = models.DateField(blank=True, null=True, max_length=100)
-    event_time = models.TimeField()
-    event_location = models.CharField(blank=True, null=True, max_length=100)
-    delivery_address = models.CharField(blank=True, null=True, max_length=100)
-    total_amount = models.PositiveIntegerField(default=0, blank=True)
-    taxes = models.PositiveIntegerField(default=0, blank=True)
-    create = models.DateTimeField(auto_now=True, blank=True, null=True, max_length=100)
-    
-    # grand_total=models.PositiveIntegerField()
 
 
 RESTRICTION_CHOICES = (
@@ -66,16 +49,17 @@ RESTRICTION_CHOICES = (
 )
 
 
-class Events(models.Model):
-    name = models.CharField(blank=True, null=True, max_length=100)
-    image = models.ImageField(null=True, blank=True, default="media/default.png")
 
 
 
 class Categories(models.Model):
     name = models.CharField(blank=True, null=True, max_length=100)
     image=models.ImageField(upload_to=None, null=True, blank=True,default="media/default.png")
-    #vendor=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
+     #vendor=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
+
+    
+
+
 class Vendors(models.Model):
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True)
     name = models.CharField(blank=True, null=True, max_length=100)
@@ -83,16 +67,25 @@ class Vendors(models.Model):
     description = models.TextField(blank=True, null=True, max_length=400)
     is_favorite = models.BooleanField(default=False, null=True, blank=True)
     categories=models.ForeignKey(Categories,null=True,blank=True, on_delete=models.CASCADE)
-    
+    #Products=models.ForeignKey(Product,null=True,blank=True, on_delete=models.CASCADE)
+    #Package=models.ForeignKey(Packages,null=True,blank=True, on_delete=models.CASCADE)
+    #Service=models.ForeignKey(Services,null=True,blank=True, on_delete=models.CASCADE)
     # project_gallery = models.ForeignKey(
     #     Image,
     #     null=True,
     #     blank=True,
     #     default="media/default.png",
     #     on_delete=models.CASCADE,
-    # )  
-    
+    # )
 
+class Events(models.Model):
+    event_title = models.CharField(blank=True, null=True, max_length=100)
+    event_image = models.ImageField(null=True, blank=True, default="media/default.png")
+    event_type = models.CharField(blank=True, null=True, max_length=100)
+    event_date = models.DateField(blank=True, null=True, max_length=100)
+    event_time = models.TimeField(auto_now_add=False,blank=True, null=True)
+    event_location = models.CharField(blank=True, null=True, max_length=100)
+    Vendor=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
     
 class ImageList(models.Model):
     image=models.ImageField(
@@ -108,24 +101,13 @@ class VendorsReview(models.Model):
     )
     description = models.CharField(max_length=250, null=True, blank=True)#change to review
 
-
-
 class Services(models.Model):
-    vendor_id = models.ForeignKey(Vendors, on_delete=models.CASCADE)
+    vendors=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
     service_name = models.CharField(blank=True, null=True, max_length=100)
     service_image = models.ImageField(upload_to=None, null=True, blank=True)
 
     service_minAmount = models.PositiveIntegerField(default=0)
     service_maxAmount = models.PositiveIntegerField(default=0)
-    
-class Packages(models.Model):
-    vendor_id = models.ForeignKey(Vendors, on_delete=models.CASCADE)
-    packages_type=models.CharField(blank=True, null=True, max_length=100)
-    duration=models.TimeField()
-    amount=models.PositiveIntegerField(default=0, blank=True)
-    
-    
-
 class ServicesReview(models.Model):
     services = models.ForeignKey(Services, on_delete=models.CASCADE)
     rating = models.FloatField(
@@ -143,20 +125,58 @@ class ChatList(models.Model):
     last_messageDate = models.DateField(blank=True, null=True, max_length=100)
 
 
+    
+
+
+
+class Product(models.Model):
+    vendors=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
+    product_name=models.CharField(blank=True, null=True, max_length=100)
+    product_type=models.CharField(null=True, max_length=100)
+    prodcut_amount=models.PositiveIntegerField(default=0)
+    #product_quantity=models.PositiveIntegerField(default=1)  
+
+
+class Packages(models.Model):
+    vendors=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
+    packages_type=models.CharField(blank=True, null=True, max_length=100)
+    duration=models.TimeField(auto_now_add=False,blank=True, null=True)
+    amount=models.PositiveIntegerField(default=0, blank=True)
+
+class Order(models.Model):
+    # order
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    order_Type = models.CharField(max_length=20, choices=ORDER_CHOICES, null=True)
+    order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, null=True)
+    Vendor =models.ForeignKey(Vendors, null=True,on_delete=models.CASCADE)
+    delivery_address = models.CharField(blank=True, null=True, max_length=100)
+    #total_amount = models.PositiveIntegerField(default=0, blank=True)
+    #taxes = models.PositiveIntegerField(default=0, blank=True)
+    order_create = models.DateTimeField(auto_now=True,blank=True, null=True)
+    # grand_total=models.PositiveIntegerField()
+    # Packages = models.ForeignKey(Packages,blank=True, null=True, on_delete=models.CASCADE)
+    # Packages_quantity=models.PositiveIntegerField(default=1)  
+    # Product = models.ForeignKey(Product, blank=True, null=True,on_delete=models.CASCADE)
+    # Product_quantity=models.PositiveIntegerField(default=1)  
+    
+
+  
 class Cart(models.Model):
     cartID = models.ForeignKey(
         CustomUser, blank=True, null=True, on_delete=models.CASCADE
     )
-    cart_createdDate = models.DateField(blank=True, null=True, max_length=100)
-    cart_createdTime = models.TimeField()
+    cart_createdDate = models.DateField(auto_now_add=False,blank=True, null=True)
+    cart_createdTime = models.TimeField(auto_now_add=True,blank=True, null=True)
     
 class CreateCart(models.Model):
     cart = models.ForeignKey(
         Cart, blank=True, null=True, on_delete=models.CASCADE)
-    order = models.ForeignKey(
-        Order,null=True, on_delete=models.CASCADE)
-    
-    
+    # order = models.ForeignKey(
+    #     Order,null=True, on_delete=models.CASCADE)
+    Packages = models.ForeignKey(Packages,blank=True, null=True, on_delete=models.CASCADE)
+    Packages_quantity=models.PositiveIntegerField(default=1)  
+    Product = models.ForeignKey(Product, blank=True, null=True,on_delete=models.CASCADE)
+    Product_quantity=models.PositiveIntegerField(default=1)  
     
     
     
@@ -171,7 +191,7 @@ class Member(models.Model):
     # )
     captain = models.CharField(blank=True, null=True, max_length=100)
     vice_captain = models.CharField(blank=True, null=True, max_length=100)
-    create = models.DateTimeField(auto_now=True, blank=True, null=True, max_length=100)
+    create = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
 class Team(models.Model):
@@ -199,6 +219,5 @@ class Proposals(models.Model):
     Proposals_status = models.CharField(max_length=20, choices=Proposals_STATUS, null=True)
     Proposals_type = models.CharField(max_length=20, choices=Proposals_STATUS, null=True)
     title = models.TextField(blank=True, null=True, max_length=400)
-    created = models.DateTimeField(auto_now_add=True)
-    
+    created = models.DateTimeField(auto_now_add=False,blank=True, null=True)
     

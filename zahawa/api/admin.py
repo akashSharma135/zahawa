@@ -13,3 +13,8 @@ admin.site.register(models.Order)
 admin.site.register(models.Packages)
 admin.site.register(models.Room)
 admin.site.register(models.Categories)
+admin.site.register(models.Product)
+admin.site.register(models.CustomUser)
+admin.site.register(models.CreateCart)
+admin.site.register(models.Cart)
+

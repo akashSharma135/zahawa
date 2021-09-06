@@ -1,9 +1,63 @@
 from rest_framework import serializers
 from . import models
-from django.db.models import Avg
 from rest_framework.response import Response
+from django.db.models import F,FloatField ,Sum ,Avg
 
 
+
+
+
+class UserCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Cart
+        fields ='__all__'
+
+class OrderCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CreateCart
+        fields ='__all__'
+
+
+class postOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Order
+        fields ='__all__'
+        
+
+    
+class OrderSerializer(serializers.ModelSerializer):
+    event_details=serializers.SerializerMethodField()
+    package_details=serializers.SerializerMethodField()
+    # subamount=serializers.SerializerMethodField()
+    # total_amount=serializers.SerializerMethodField()
+    class Meta:
+        model = models.Order
+        fields =['user',
+                 'order_Type',
+                 'order_status',
+                 'delivery_address',
+                 'order_create',
+                 'Vendor',
+                 'event_details',
+                 'package_details',
+                ]
+    def get_event_details(self,obj):
+        event_details=models.Events.objects.filter(Vendor=obj.Vendor)
+        return str(event_details)
+    
+    def get_package_details(self,obj):
+        package_details=models.Packages.objects.filter(vendors=obj.Vendor)
+        return str(package_details)
+    
+    
+
+    # def get_subamount(self,obj):
+    #     return models.CreateCart.objects.filter(cart__cartID=obj.user).aggregate(
+    #         total=Sum(F('prodcut_amount')*F('product_quantity'),output_field=FloatField()))["total"]
+
+    # def get_total_amount(self,obj):
+    #     return models.Order.objects.filter(Vendor=obj.Vendor).aggregate(
+    #         total=Sum(F('taxes')+F('total_amount'),output_field=FloatField()))["total"]
 
 class DetailsSerializers(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
@@ -47,11 +101,13 @@ class ServicesSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.Services
         fields = "__all__"
-
+############-----------------------------------
 class OrderUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Order
         fields = ['event_title','event_type','event_date','event_time','event_location','total_amount']
+#######-----------------------------
+
 class ProposalUserSerializer(serializers.ModelSerializer):
     service_name= serializers.SerializerMethodField()
     class Meta:
