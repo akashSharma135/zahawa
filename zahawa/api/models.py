@@ -55,7 +55,6 @@ RESTRICTION_CHOICES = (
 class Categories(models.Model):
     name = models.CharField(blank=True, null=True, max_length=100)
     image=models.ImageField(upload_to=None, null=True, blank=True,default="media/default.png")
-     #vendor=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
 
     
 
@@ -209,7 +208,7 @@ class Member(models.Model):
 
 Proposals_STATUS= (
     
-      ("Submitted", "Submitted"),
+    ("Submitted", "Submitted"),
     ("Offered", "Offered"),
     ("Completed", "Completed"),
     ("Cancelled", "Cancelled"),

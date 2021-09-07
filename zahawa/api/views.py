@@ -51,7 +51,7 @@ class SearchFilterloyalty(BaseFilterBackend):
                coreapi.Field(
                 name="room_type", location="query", required=False, type="id"
             )
-        
+
 
         ]
 class SearchFilterApiSearch(BaseFilterBackend):
