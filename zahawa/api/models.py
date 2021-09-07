@@ -134,7 +134,9 @@ class Packages(models.Model):
     vendors=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
     packages_type=models.CharField(blank=True, null=True, max_length=100)
     duration=models.TimeField(auto_now_add=False,blank=True, null=True)
-    #amount=models.PositiveIntegerField(default=0, blank=True)
+    amount=models.PositiveIntegerField(default=0, blank=True)
+    image = models.ImageField(null=True, blank=True, default="media/default.png")
+    
 
 class Events(models.Model):
     event_title = models.CharField(blank=True, null=True, max_length=100)

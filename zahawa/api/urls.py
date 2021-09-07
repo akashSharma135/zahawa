@@ -25,6 +25,6 @@ urlpatterns = [
     path("MyCart/", views.MyCartView.as_view()),
     path("MyCart/<int:pk>/", views.MyCartView.as_view()),
     path("TeamView/<int:pk>/", views.TeamView.as_view()),
+    path("service_package_deatils/", views.ServicePackageView.as_view()),
     
 ]
-
