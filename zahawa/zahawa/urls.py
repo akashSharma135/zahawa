@@ -26,6 +26,8 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from social_login.views import FacebookLogin, GoogleLogin,AppleLogin
+from notification.views import SendedNotificationList, SendedNotificationTypes
+
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -46,6 +48,9 @@ urlpatterns = [
     path('auth/', include('users.urls')),
     path('api/', include('api.urls')),
 
+    path("notifications-list", SendedNotificationList.as_view()),
+    path("notifications-types", SendedNotificationTypes.as_view()),
+        
     # social login apis
     path('rest-auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
     path('rest-auth/google/', GoogleLogin.as_view(), name='google_login'),
