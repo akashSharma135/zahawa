@@ -26,23 +26,66 @@ class UserCartSerializer(serializers.ModelSerializer):
         model = models.Cart
         fields ='__all__'
 
-class OrderCartSerializer(serializers.ModelSerializer):
+
+
+
+# class postOrderSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = models.Order
+#         fields ='__all__'
+        
+class EventsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Events
+        fields = "__all__"
+
+class PackagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =models.Packages
+        fields = "__all__"
+ 
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =models.Product
+        fields = "__all__"   
+
+class MyCartPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =models.CreateCart
+        fields = "__all__"   
+
+    
+class MyCartSerializer(serializers.ModelSerializer):
+    event_details=serializers.SerializerMethodField()
+    Packages=serializers.SerializerMethodField()
+    Product=serializers.SerializerMethodField()
+    subamount=serializers.SerializerMethodField()
     class Meta:
         model = models.CreateCart
         fields ='__all__'
-
-
-class postOrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Order
-        fields ='__all__'
-        
-
     
+    def get_event_details(self,obj):
+        event_details=models.Events.objects.filter(Packages=obj.Packages)
+        serializer= EventsSerializer(event_details,many=True)
+        return serializer.data
+    
+    def get_Packages(self,obj):
+        package_details=models.Packages.objects.filter(vendors=obj.Packages.vendors)
+        serializer=PackagesSerializer(package_details,many=True)
+        return serializer.data
+    def get_Product(self,obj):
+        package_details=models.Product.objects.filter(vendors=obj.Packages.vendors)
+        serializer=ProductSerializer(package_details,many=True)
+        return serializer.data
+    
+    def get_subamount(self,obj):
+        return models.CreateCart.objects.filter(pk=obj.id).aggregate(
+            total=Sum(F('prodcut_amount')*F('Product_quantity'),output_field=FloatField()))["total"]
+
 class OrderSerializer(serializers.ModelSerializer):
     event_details=serializers.SerializerMethodField()
-    package_details=serializers.SerializerMethodField()
-    # subamount=serializers.SerializerMethodField()
+    package=serializers.SerializerMethodField()
+    subamount=serializers.SerializerMethodField()
     # total_amount=serializers.SerializerMethodField()
     class Meta:
         model = models.Order
@@ -51,23 +94,23 @@ class OrderSerializer(serializers.ModelSerializer):
                  'order_status',
                  'delivery_address',
                  'order_create',
-                 'Vendor',
                  'event_details',
-                 'package_details',
+                 'package',
+                 'subamount',
                 ]
     def get_event_details(self,obj):
-        event_details=models.Events.objects.filter(Vendor=obj.Vendor)
-        return str(event_details)
+        event_details=models.Events.objects.filter(Packages=obj.Cart.Packages)
+        serializer= EventsSerializer(event_details,many=True)
+        return serializer.data
     
-    def get_package_details(self,obj):
-        package_details=models.Packages.objects.filter(vendors=obj.Vendor)
-        return str(package_details)
-    
-    
+    def get_package(self,obj):
+        package_details=models.Packages.objects.filter(vendors=obj.Cart.Packages.vendors)
+        serializer=PackagesSerializer(package_details,many=True)
+        return serializer.data
 
-    # def get_subamount(self,obj):
-    #     return models.CreateCart.objects.filter(cart__cartID=obj.user).aggregate(
-    #         total=Sum(F('prodcut_amount')*F('product_quantity'),output_field=FloatField()))["total"]
+    def get_subamount(self,obj):
+        return models.CreateCart.objects.filter(cart__cartID=obj.user).aggregate(
+            total=Sum(F('prodcut_amount')*F('Product_quantity'),output_field=FloatField()))["total"]
 
     # def get_total_amount(self,obj):
     #     return models.Order.objects.filter(Vendor=obj.Vendor).aggregate(
@@ -194,10 +237,7 @@ class VendorListSerializer(serializers.ModelSerializer):
         user_images = models.CustomUser.objects.filter(id=obj.id).values_list("profile_picture",flat=True)
         return user_images
     
-class EventsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Events
-        fields = "__all__"
+
 
 
 
