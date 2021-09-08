@@ -205,6 +205,42 @@ class ServiceSerializer(serializers.ModelSerializer):
         )
         return str(rating["rating__avg"])
 
+
+class ServicePackageSerializer(serializers.ModelSerializer):
+    avg_rating = serializers.SerializerMethodField()
+    vendor_name=serializers.SerializerMethodField()
+    vendor_categories=serializers.SerializerMethodField()
+    users_reviews=serializers.SerializerMethodField()
+    packages=serializers.SerializerMethodField()
+    class Meta:
+        model = models.Vendors
+        fields = ['id','service_image','service_name','vendor_name','vendor_categories','users_reviews','avg_rating','service_minAmount','service_maxAmount','packages',]
+    
+    def get_avg_rating(self, obj):
+        rating = models.VendorsReview.objects.filter(vendor=obj.id).aggregate(
+            Avg("rating")
+        )
+        return str(rating["rating__avg"])
+    
+    def get_vendor_name(self,obj):
+        vendor_name=models.Vendors.objects.filter(name=obj.vendors).values_list("name",flat=True)
+        return vendor_name
+    
+    def get_vendor_categories(self,obj):
+        vendor_categories=models.Categories.objects.filter(pk=obj.vendors.categories_id)
+        serializer = CategoriesSerializers(vendor_categories,many=True)
+        return serializer.data
+    
+    def get_users_reviews(self,obj):
+        users_reviews=models.VendorsReview.objects.filter(vendor=obj.vendors)
+        serializer=VendorsReviewserializer(users_reviews,many=True)
+        return serializer.data
+    
+    def get_packages(self,obj):
+        packages_deatils=models.Packages.objects.filter(vendors_id=obj.vendors_id)
+        serializer =PackagesSerializer(packages_deatils,many=True)
+        return serializer.data
+    
 class VendorListSerializer(serializers.ModelSerializer):
     avg_rating = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()

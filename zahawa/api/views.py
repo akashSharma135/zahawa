@@ -82,15 +82,32 @@ class SearchProposalBackend(BaseFilterBackend):
         ]
         
 
+class ServicePackageFilterBackend(BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name="vendor_id", location="query", required=False, type="id"
+            ),
+            coreapi.Field(
+                name="service_id", location="query", required=False, type="id"
+            )
+        ]
+
+class ServicePackageView(APIView):
+    filter_backends = (ServicePackageFilterBackend,)
+    def get(self, request,):
+        vendor_id=request.GET.get("vendor_id")
+        service_id=request.GET.get("service_id")
+        objects=models.Services.objects.filter(pk=service_id,vendors=vendor_id)
+        serializer= serializers.ServicePackageSerializer(objects,many=True)
+        return Response(serializer.data)
+
 class Order(APIView):
     def get(self, request,pk):
         ID=request.GET.get("user_id")
         objects=models.Order.objects.filter(user=ID)
         serializer= serializers.OrderListserializer(objects,many=True)
         return Response(serializer.data)
-
-
-
 
 class TeamView(APIView):
     def get(self, request,pk):
