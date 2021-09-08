@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
+    "notification.apps.NotificationConfig",
     'fcm_django',
     'django_admin_json_editor',
     'geolocation_fields',

@@ -51,7 +51,7 @@ class SearchFilterloyalty(BaseFilterBackend):
                coreapi.Field(
                 name="room_type", location="query", required=False, type="id"
             )
-        
+
 
         ]
 class SearchFilterApiSearch(BaseFilterBackend):
@@ -222,11 +222,10 @@ class UserOrderView(APIView):
         ID=request.GET.get("user_id")
         if ID:
             objects = models.Order.objects.filter(user=ID)
-            # objects = models.Order.objects.filter(user=request.user)
             serializer= serializers.OrderSerializer(objects,many=True)
             return Response(serializer.data)
         else:
-            objects = models.Order.objects.all()
+            objects = models.Order.objects.filter(user=request.user)
             serializer= serializers.OrderSerializer(objects,many=True)
             return Response(serializer.data)
             
