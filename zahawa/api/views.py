@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from . import models
 from . import serializers
+from rest_framework.permissions import IsAuthenticated
 from users.models import CustomUser as User
 from django.contrib.auth import get_user_model
 from django.db.models.query_utils import Q
@@ -35,13 +36,13 @@ class SearchFilterOrderView(BaseFilterBackend):
         ]
 
 
-class SearchFilterVendor(BaseFilterBackend):
-    def get_schema_fields(self, view):
-        return [
-            coreapi.Field(
-                name="vendor_id", location="query", required=False, type="id"
-            )
-        ]
+# class SearchFilterVendor(BaseFilterBackend):
+#     def get_schema_fields(self, view):
+#         return [
+#             coreapi.Field(
+#                 name="vendor_id", location="query", required=False, type="id"
+#             )
+#         ]
 class SearchFilterloyalty(BaseFilterBackend):
     def get_schema_fields(self, view):
         return [
@@ -116,19 +117,19 @@ class TeamView(APIView):
         return Response(serializer.data)
     
     
-    def get_serializer(self):
-        properties = {
-            "thumb": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Image"
-            ),
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="string"
-            )
-        }
-        return_openapi_schema = openapi.Schema(
-            type=openapi.TYPE_OBJECT, properties=properties
-        )
-        return return_openapi_schema
+    # def get_serializer(self):
+    #     properties = {
+    #         "thumb": openapi.Schema(
+    #             type=openapi.TYPE_STRING, description="Image"
+    #         ),
+    #         "name": openapi.Schema(
+    #             type=openapi.TYPE_STRING, description="string"
+    #         )
+    #     }
+    #     return_openapi_schema = openapi.Schema(
+    #         type=openapi.TYPE_OBJECT, properties=properties
+    #     )
+    #     return return_openapi_schema
     def patch(self, request,pk):
         objects = get_object_or_404(
             models.Team.objects.filter(pk=pk))
@@ -137,7 +138,7 @@ class TeamView(APIView):
         )
         if serializer.is_valid():
             serializer.save()
-        return Response(serializer.data)
+        return Response({"Team Updated":serializer.data})
 
 
 class UserCartView(APIView):
@@ -162,7 +163,7 @@ class MycartOrderFilter(BaseFilterBackend):
 
 class MyCartView(APIView):
     def get(self, request):
-        objects=models.CreateCart.objects.filter(cart__cartID=request.user)
+        objects=models.CartItem.objects.filter(cart__user=request.user)
         serializer= serializers.MyCartSerializer(objects,many=True)
         return Response(serializer.data)
     
@@ -173,13 +174,14 @@ class MyCartView(APIView):
         serializer=serializers.MyCartPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response({"message" : "New event cart created",
+                            "Result":serializer.data})
         else:
             return Response(serializer.errors)
             
     def delete(self,request,pk):
         ID=request.GET.get("cart_id")
-        objects=models.CreateCart.objects.filter(pk=pk).delete()
+        objects=models.CartItem.objects.filter(pk=pk).delete()
         return Response("NO_CONTENT",status=status.HTTP_204_NO_CONTENT)
 
 
@@ -188,25 +190,21 @@ class MyCartView(APIView):
 class OrderSearchView(APIView):
     filter_backends = (SearchFilterOrder,)
     def get(self, request):
+        filters=request.GET.get("filter")
         keyword=request.GET.get("keyword")
-        if keyword=="Active":
-            objects=models.Order.objects.filter(order_Type__contains=keyword)
-            serializer =serializers.OrderSerializer(objects,many=True)
-            return Response({"Keyword":keyword,
-                            "count":objects.count(),
-                            "result":serializer.data})
-        if keyword=="Completed":
-            objects=models.Order.objects.filter(order_Type__contains=Completed)
-            serializer =serializers.OrderSerializer(objects,many=True)
-            return Response({"Keyword":keyword,
-                            "count":objects.count(),
-                            "result":serializer.data})
+        serializer=[]; 
+        Count=0
+        if filters or keyword:
+            objects1=models.Order.objects.filter(delivery_address__contains=keyword,order_status=filters)
+            Count =objects1.count()
+            serializer=serializers.RoomSerializer(objects1,many=True).data
+        return Response({
+                "keyword":keyword,
+                "filter":filters,
+                "cont":Count,
+                "result":serializer})    
+        
 
-        else:
-            objects=models.Order.objects.filter(Q(order_Type="Active")|Q(order_Type="Completed"))
-            serializer =serializers.OrderSerializer(objects,many=True)
-            return Response(serializer.data)
-            
 #all orders detail view
 # class OrderDetailsView(APIView):
 #     def get(self, request):
@@ -218,6 +216,7 @@ class OrderSearchView(APIView):
 #order by user id view
 class UserOrderView(APIView):
     filter_backends = (SearchFilterOrderView,)
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         ID=request.GET.get("user_id")
         if ID:
@@ -293,22 +292,27 @@ class loyaltySearchView(APIView):
     def get(self, request):
         room=request.GET.get("room")
         room_type=request.GET.get("room_type")
+        Serializer=[]; 
+        Count1=0
+        Count2=0
         if room: 
             objects=models.Room.objects.filter(room__contains=room)
-            Count=objects.count()
-            Serializers=serializers.RoomSerializer(objects,many=True)
-            return Response({
-                "keyword":room,
-                "cont":Count,
-                "result":Serializers.data})    
+            Count1=objects.count()
+            Serializers1=serializers.RoomSerializer(objects,many=True).data
+            Serializer=Serializer+Serializers1
+     
         if room_type:
             objects=models.Room.objects.filter(room_type__contains=room_type)
-            Count=objects.count()
-            Serializers=serializers.RoomSerializer(objects,many=True)
-            return Response({
-                    "keyword":room_type,
-                    "cont":Count,
-                    "result":Serializers.data}) 
+            Count2=objects.count()
+            Serializers2=serializers.RoomSerializer(objects,many=True).data
+            Serializer=Serializer+Serializers2
+        return Response({
+                "keyword1":room_type,
+                "cont1":Count1,
+                "keyword2":room,
+                "cont2":Count2,
+                "result":Serializer
+                }) 
 
 
 class ApiSearchViewFilterBackend(BaseFilterBackend):
@@ -334,38 +338,46 @@ class ApiSearchViewFilterBackend(BaseFilterBackend):
 class ApiSearchView(APIView):
     filter_backends = (ApiSearchViewFilterBackend,)
     def get(self, request):
-        name=request.GET.get("name")
+        name_search=request.GET.get("name")
         description=request.GET.get("description")
-        if name: 
-            objects=models.Vendors.objects.filter(name__contains=name)
-            Count=objects.count()
-            Serializers=serializers.VendorsSerializers(objects,many=True)
-            return Response({
-                "keyword":name,
-                "cont":Count,
-                "result":Serializers.data})    
+        service_name=request.GET.get("service_name")
+        product_name=request.GET.get("product")
+        count1=0
+        count2=0
+        count3=0
+        count4=0
+        Services=[]; 
+        Vendors=[]; 
+        Product=[]; 
+        if name_search: 
+            objects=models.Vendors.objects.filter(name__contains=name_search)
+            count1=objects.count()
+            Serializers1=serializers.VendorsSerializers(objects,many=True).data
+            Vendors=Vendors+Serializers1
+          
         if description:
             objects=models.Vendors.objects.filter(description__contains=description)
-            Count=objects.count()
-            Serializers=serializers.VendorsSerializers(objects,many=True)
-            return Response({
-                    "keyword":description,
-                    "cont":Count,
-                    "result":Serializers.data})   
+            count2=objects.count()
+            Serializers2=serializers.VendorsSerializers(objects,many=True).data
+            Vendors=Vendors+Serializers2
             
-        service_name=request.GET.get("service_name")
         if service_name:
             objects=models.Services.objects.filter(service_name__contains=service_name) 
-            Serializers=serializers.ServicesSerializers(objects,many=True)
-            return Response({
-                        "keyword":service_name,
-                        "cont":Count,
-                        "result":Serializers.data})  
-        else:
-            objects=models.Vendors.objects.all()
-            Serializers=serializers.VendorsSerializers(objects,many=True)
-            return Response(Serializers.data)   
-
+            count3=objects.count()
+            Serializers3=serializers.ServicesSerializers(objects,many=True).data
+            Services=Services+Serializers3
+        if product_name:
+            objects=models.Product.objects.filter(product_name__contains=product_name) 
+            count4=objects.count()
+            Serializers4=serializers.ProductSerializer(objects,many=True).data
+            Product=Product+Serializers4
+        return Response({
+	            "vendors": {"keyword1":name_search , "count1":count1 ,"keyword2":description , "count2":count2 ,"result": [Vendors]},
+	            "services": {"keyword": service_name, "count": count3, "result": [Services]},
+                "products": {"keyword": product_name, "count":count4, "result": [Product]},
+                        })
+        
+   
 
 class PropsalViewFilterBackend(BaseFilterBackend):
     filter_backends = (SearchProposalBackend,)
@@ -393,24 +405,27 @@ class PropsalView(APIView):
     def get(self, request):
         get_data=request.query_params
         search_text = get_data.get("keyword")
+        count=0
+        serializer=[]; 
         if search_text:
             Proposals_type=models.Proposals.objects.filter(Proposals_type=search_text)
             count=Proposals_type.count()
-            serializer = serializers.ProposalUserSerializer(Proposals_type, many=True)
-            return Response( {
-                    "proposals":search_text,
-                    "count":count,
-                    "result":serializer.data})
-         
-        else:
-            search_text = get_data.get("user_id")
-            Proposals=models.Proposals.objects.filter(user_id=search_text)
-            order=models.Order.objects.filter(user_id=search_text)
-            services=models.Vendors.objects.filter(user_id=search_text)
-            serializer1 = serializers.ProposalUserSerializer(Proposals, many=True)
-            serializer2 = serializers.OrderUserSerializer(order, many=True)
-            response=serializer1.data+serializer2.data
-            return Response(response)
+            serializer1 = serializers.ProposalUserSerializer(Proposals_type, many=True).data
+            serializer=serializer+serializer1
+        return Response( {
+            "proposals":search_text,
+            "count":count,
+            "result":serializer})
+        
+class PropsalUserView(APIView):
+    def get(self, request,pk):
+        Proposals=models.Proposals.objects.filter(user_id=pk)
+        Events=models.Events.objects.filter(Packages__vendors__user_id=pk)
+        services=models.Vendors.objects.filter(user_id=pk)
+        serializer1 = serializers.ProposalUserSerializer(Proposals, many=True)
+        serializer2 = serializers.EventsUserSerializer(Events, many=True)
+        response=serializer1.data+serializer2.data
+        return Response(response)
 
     def get_serializer(self):
         return serializers.ProposalUserSerializer()
@@ -423,35 +438,24 @@ class PropsalView(APIView):
         return Response(Serializers.errors)
 
 
-class VendorReviewFilterBackend(BaseFilterBackend):
-    def get_schema_fields(self, view):
-        return [
-            coreapi.Field(
-                name="vendor_id",
-                location="query",
-                required=False,
-                type="string",
-                description="send search keyword",
-            )
-        ]
+# class VendorReviewFilterBackend(BaseFilterBackend):
+#     def get_schema_fields(self, view):
+#         return [
+#             coreapi.Field(
+#                 name="vendor_id",
+#                 location="query",
+#                 required=False,
+#                 type="string",
+#                 description="send search keyword",
+#             )
+#         ]
 
 
 class VendorReviewView(APIView):
-    filter_backends = (SearchFilterVendor,)
-    def get(self, request):
-        filter_backends = (VendorReviewFilterBackend,)
-        get_data=request.query_params
-        ID = get_data.get("vendor_id")
-        if ID:
-            objects = models.VendorsReview.objects.filter(vendor_id=ID)
-            serializer = serializers.VendorsReviewserializer(objects, many=True)
-            return Response({
-                            "Vandor_id":ID,
-                            "reviews":serializer.data})
-        else:
-            objects = models.VendorsReview.objects.all()
-            serializer = serializers.VendorsReviewserializer(objects, many=True)
-            return Response({"reviews":serializer.data})
+    def get(self, request,pk):
+        objects = models.VendorsReview.objects.filter(vendor_id=pk)
+        serializer = serializers.VendorsReviewserializer(objects, many=True)
+        return Response({"reviews":serializer.data})
             
 class ServiceListView(APIView):
     def get(self, request):
@@ -462,14 +466,11 @@ class ServiceListView(APIView):
 
     
 class VendorServiceView(APIView):
-    filter_backends = (SearchFilterVendor,)
-    def get(self, request):
-        get_data=request.query_params
-        ID = get_data.get("vendor_id")
-        objects = models.Services.objects.filter(vendors_id=ID)
+    def get(self, request,pk):
+        objects = models.Services.objects.filter(vendors_id=pk)
         serializer = serializers.ServiceSerializer(objects, many=True)
         return Response({
-            "vendor_id":ID,
+            "vendor_id":pk,
             "Services":serializer.data}
                         
         )
