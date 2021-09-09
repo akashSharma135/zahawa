@@ -51,7 +51,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class MyCartPostSerializer(serializers.ModelSerializer):
     class Meta:
-        model =models.CreateCart
+        model =models.CartItem
         fields = "__all__"   
 
     
@@ -61,7 +61,7 @@ class MyCartSerializer(serializers.ModelSerializer):
     Product=serializers.SerializerMethodField()
     subamount=serializers.SerializerMethodField()
     class Meta:
-        model = models.CreateCart
+        model = models.CartItem
         fields ='__all__'
     
     def get_event_details(self,obj):
@@ -79,7 +79,7 @@ class MyCartSerializer(serializers.ModelSerializer):
         return serializer.data
     
     def get_subamount(self,obj):
-        return models.CreateCart.objects.filter(pk=obj.id).aggregate(
+        return models.CartItem.objects.filter(pk=obj.id).aggregate(
             total=Sum(F('prodcut_amount')*F('Product_quantity'),output_field=FloatField()))["total"]
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -109,7 +109,7 @@ class OrderSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_subamount(self,obj):
-        return models.CreateCart.objects.filter(cart__cartID=obj.user).aggregate(
+        return models.CartItem.objects.filter(cart__user=obj.user).aggregate(
             total=Sum(F('prodcut_amount')*F('Product_quantity'),output_field=FloatField()))["total"]
 
     # def get_total_amount(self,obj):
@@ -159,10 +159,10 @@ class ServicesSerializers(serializers.ModelSerializer):
         model = models.Services
         fields = "__all__"
 ############-----------------------------------
-class OrderUserSerializer(serializers.ModelSerializer):
+class EventsUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Order
-        fields = ['event_title','event_type','event_date','event_time','event_location','total_amount']
+        model = models.Events
+        fields = ['event_title','event_type','event_date','event_time','event_location',]
 #######-----------------------------
 
 
@@ -188,7 +188,7 @@ class VendorsReviewserializer(serializers.ModelSerializer):
     user_image= serializers.SerializerMethodField()
     class Meta:
         model = models.VendorsReview
-        fields = ['user','user_image','rating','description']
+        fields = ['id','user','user_image','rating','description']
         
     def get_user_image(self, obj):
         image = models.CustomUser.objects.filter(profile_picture=obj.user.id)
@@ -213,7 +213,7 @@ class ServicePackageSerializer(serializers.ModelSerializer):
     users_reviews=serializers.SerializerMethodField()
     packages=serializers.SerializerMethodField()
     class Meta:
-        model = models.Vendors
+        model = models.Services
         fields = ['id','service_image','service_name','vendor_name','vendor_categories','users_reviews','avg_rating','service_minAmount','service_maxAmount','packages',]
     
     def get_avg_rating(self, obj):

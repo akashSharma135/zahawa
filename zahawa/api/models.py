@@ -149,13 +149,13 @@ class Events(models.Model):
 
   
 class Cart(models.Model):
-    cartID = models.ForeignKey(
+    user = models.ForeignKey(
         CustomUser, blank=True, null=True, on_delete=models.CASCADE
     )
     cart_createdDate = models.DateField(auto_now_add=False,blank=True, null=True)
     cart_createdTime = models.TimeField(auto_now_add=True,blank=True, null=True)
     
-class CreateCart(models.Model):
+class CartItem(models.Model):
     cart = models.ForeignKey(
         Cart, blank=True, null=True, on_delete=models.CASCADE)
     # order = models.ForeignKey(
@@ -171,7 +171,7 @@ class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     order_Type = models.CharField(max_length=20, choices=ORDER_CHOICES, null=True)
     order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, null=True)
-    Cart=models.ForeignKey(CreateCart, null=True,on_delete=models.CASCADE)
+    Cart=models.ForeignKey(CartItem, null=True,on_delete=models.CASCADE)
     # Vendor =models.ForeignKey(Vendors, null=True,on_delete=models.CASCADE)
     delivery_address = models.CharField(blank=True, null=True, max_length=100)
     #total_amount = models.PositiveIntegerField(default=0, blank=True)
