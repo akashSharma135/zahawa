@@ -19,6 +19,8 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.static import serve
+from allauth.account.views import confirm_email
+
 
 
 from django.contrib.auth import views as auth_views
@@ -55,6 +57,11 @@ urlpatterns = [
     path('rest-auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
     path('rest-auth/google/', GoogleLogin.as_view(), name='google_login'),
     path("rest-auth/apple/", AppleLogin.as_view(), name="apple-login"),
+
+    # password reset
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name="password/password_reset_confirm.html"), name='password_reset_confirm'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='password/password_reset_done.html'), name='password_reset_done'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password/password_reset_complete.html'), name='password_reset_complete'), 
 
     # swagger apis
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),

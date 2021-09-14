@@ -1,0 +1,65 @@
+{% extends "admin/index.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  <link rel="stylesheet" type="text/css" href="{% static 'material/admin/css/index.min.css' %}">
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+    {% include 'material/admin/includes/app_content.html' %}
+    <script src="{% static 'users/js/add_chart.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+    <script>
+        $(function () {
+
+          var $orderChart = $("#orderChart");
+          var ctx = $orderChart[0].getContext("2d");
+
+          var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: [],
+                  datasets: [{
+                    label: 'Orders',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    data: []
+                  }]
+                },
+                options: {
+                  responsive: true,
+                }
+              });
+
+          function ajax_chart(chart) {
+            $.ajax({
+                url: $("#orderChart").attr("data-url"),
+                success: function (data) {
+                    chart.data.labels = data.labels,
+                    chart.data.datasets[0].data = data.data,
+                    chart.update()
+                }
+              });
+          }
+
+          ajax_chart(myChart);
+
+          $("#monthly").on("click", function() {
+            console.log("monthly clicked");
+            $orderChart.attr("data-url", "/api/admin-index-order-graph/?view_type=monthly");
+            ajax_chart(myChart);
+          });
+
+          $("#weekly").on("click", function() {
+            console.log("weekly clicked");
+            $orderChart.attr("data-url", "/api/admin-index-order-graph/?view_type=weekly");
+            ajax_chart(myChart);
+          });
+        });
+    </script>
+
+{% endblock %}
