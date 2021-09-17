@@ -1,3 +1,4 @@
+from django.db.models.fields import json
 from rest_framework import serializers
 from . import models
 from rest_framework.response import Response
@@ -47,7 +48,7 @@ class PackagesSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model =models.Product
-        fields = "__all__"   
+        fields = ['id', 'product_name', 'product_type', 'product_amount']
 
 class MyCartPostSerializer(serializers.ModelSerializer):
     class Meta:
@@ -80,21 +81,27 @@ class MyCartSerializer(serializers.ModelSerializer):
     
     def get_subamount(self,obj):
         return models.CartItem.objects.filter(pk=obj.id).aggregate(
-            total=Sum(F('prodcut_amount')*F('Product_quantity'),output_field=FloatField()))["total"]
+            total=Sum(F('product_amount')*F('Product_quantity'),output_field=FloatField()))["total"]
 
 class OrderSerializer(serializers.ModelSerializer):
     event_details=serializers.SerializerMethodField()
     package=serializers.SerializerMethodField()
     subamount=serializers.SerializerMethodField()
+    product=serializers.SerializerMethodField()
+    vendor_name=serializers.SerializerMethodField()
+    vendor_image=serializers.SerializerMethodField()
     # total_amount=serializers.SerializerMethodField()
     class Meta:
         model = models.Order
         fields =['user',
+                 'vendor_name',
+                 'vendor_image',
                  'order_Type',
                  'order_status',
                  'delivery_address',
                  'order_create',
                  'event_details',
+                 'product',
                  'package',
                  'subamount',
                 ]
@@ -108,9 +115,20 @@ class OrderSerializer(serializers.ModelSerializer):
         serializer=PackagesSerializer(package_details,many=True)
         return serializer.data
 
+    def get_product(self, obj):
+        product_details=models.Product.objects.filter(vendors=obj.Cart.Product.vendors)
+        serializer = ProductSerializer(product_details, many=True)
+        return serializer.data
+
+    def get_vendor_name(self, obj):
+        vendor_name=models.Vendors.objects.filter(pk=obj.Cart.Product.vendors.id).values_list("name",flat=True)
+        return vendor_name[0]
+    def get_vendor_image(self, obj):
+        vendor_image=models.Vendors.objects.filter(pk=obj.Cart.Product.vendors.id).values_list("image",flat=True)
+        return vendor_image[0]
     def get_subamount(self,obj):
         return models.CartItem.objects.filter(cart__user=obj.user).aggregate(
-            total=Sum(F('prodcut_amount')*F('Product_quantity'),output_field=FloatField()))["total"]
+            total=Sum(F('product_amount')*F('Product_quantity'),output_field=FloatField()))["total"]
 
     # def get_total_amount(self,obj):
     #     return models.Order.objects.filter(Vendor=obj.Vendor).aggregate(
@@ -138,7 +156,7 @@ class PackagesSerializers(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = models.Packages
-        fields = "__all__"
+        fields = ['id', 'packages_type', 'duration', 'amount', 'image']
         
     def get_image(self, obj):
         image = models.ImageList.objects.filter(vendor_id=obj).values_list("image",flat=True)
@@ -147,7 +165,7 @@ class PackagesSerializers(serializers.ModelSerializer):
 class VendorsSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.Vendors
-        fields = "__all__"
+        fields = ['id', 'name', 'image']
 
 class VendorsTypeSerializers(serializers.ModelSerializer):
     class Meta:
