@@ -125,7 +125,7 @@ class Product(models.Model):
     vendors=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
     product_name=models.CharField(blank=True, null=True, max_length=100)
     product_type=models.CharField(null=True, max_length=100)
-    prodcut_amount=models.PositiveIntegerField(default=0)
+    product_amount=models.PositiveIntegerField(default=0)
     #product_quantity=models.PositiveIntegerField(default=1)  
 
 
@@ -164,7 +164,7 @@ class CartItem(models.Model):
     # Packages_quantity=models.PositiveIntegerField(default=1)  
     Product = models.ForeignKey(Product, blank=True, null=True,on_delete=models.CASCADE)
     Product_quantity=models.PositiveIntegerField(default=1)  
-    prodcut_amount=models.PositiveIntegerField(default=0)
+    product_amount=models.PositiveIntegerField(default=0)
     
 class Order(models.Model):
     # order
@@ -177,6 +177,7 @@ class Order(models.Model):
     #total_amount = models.PositiveIntegerField(default=0, blank=True)
     #taxes = models.PositiveIntegerField(default=0, blank=True)
     order_create = models.DateTimeField(auto_now=True,blank=True, null=True)
+    
     # grand_total=models.PositiveIntegerField()
     # Packages = models.ForeignKey(Packages,blank=True, null=True, on_delete=models.CASCADE)
     # Packages_quantity=models.PositiveIntegerField(default=1)  

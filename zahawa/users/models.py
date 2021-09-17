@@ -13,7 +13,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_("email address"), unique=True, blank=True, null=True)
     name = models.CharField(blank=True, null=True, max_length=100)
     profile_picture = models.ImageField(
-        upload_to=None, null=True, blank=True, default="media/default.png"
+        upload_to=None, null=True, blank=True, default=None
     )
 
     USERNAME_FIELD = "email"
@@ -24,7 +24,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     points = fields.PointField(blank=True, null=True, verbose_name="Point")
     phone_number = models.CharField(blank=True, null=True, max_length=100)
     verified = models.BooleanField(default=False)
-    loyalty_program = models.CharField(blank=True, null=True, max_length=400)    
+    loyalty_program = models.PositiveIntegerField(default=0, null=True)    
     language = models.CharField(blank=True, null=True, max_length=100)
     promotion_notifications = models.BooleanField(default=False,null=True,blank=True)
     promotion_sms = models.BooleanField(default=False,null=True,blank=True)
