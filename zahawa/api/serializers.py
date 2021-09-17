@@ -151,7 +151,7 @@ class CategoriesSerializers(serializers.ModelSerializer):
         model = models.Categories
         fields =['id','image','name']
         
-        
+
 class PackagesSerializers(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:

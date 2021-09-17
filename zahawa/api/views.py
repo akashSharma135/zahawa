@@ -248,6 +248,27 @@ class VendorTypeView(APIView):
             "result":serializer.data
             })
     
+# favourite vendors
+class FavouriteVendorView(APIView):
+    def get(self, request):
+        objects = models.Vendors.objects.filter(user_id=request.user.id, is_favourite=True)
+        serializer = serializers.VendorsSerializers(objects, many=True)
+        return Response(serializer.data)
+
+# Favourite products
+class FavouriteProductView(APIView):
+    def get(self, request):
+        objects = models.Product.objects.filter(user_id=request.user.id).filter(is_favourite=True)
+        serializer = serializers.ProductSerializer(objects, many=True)
+        return Response(serializer.data)
+
+# Favourite services
+class FavouriteServiceView(APIView):
+    def get(self, request):
+        objects = models.Services.objects.filter(user_id=request.user.id).filter(is_favourite=True)
+        serializer = serializers.ServiceSerializer(objects, many=True)
+        return Response(serializer.data)
+
 #view for list all Categories 
 class CategoriesView(APIView):
     def get(self, request):
