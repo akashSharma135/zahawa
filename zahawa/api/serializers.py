@@ -48,7 +48,7 @@ class PackagesSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model =models.Product
-        fields = ['id', 'product_name', 'product_type', 'product_amount']
+        fields = ['id', 'product_name', 'product_type', 'product_amount', 'vendors']
 
 class MyCartPostSerializer(serializers.ModelSerializer):
     class Meta:
@@ -175,7 +175,7 @@ class VendorsTypeSerializers(serializers.ModelSerializer):
 class ServicesSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.Services
-        fields = "__all__"
+        fields = '__all__'
 ############-----------------------------------
 class EventsUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -216,7 +216,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
     class Meta:
         model = models.Services
-        fields = ['service_image','rating','service_name','service_minAmount','service_maxAmount']
+        fields = ['service_image','rating','service_name','service_minAmount','service_maxAmount', 'vendors']
     def get_rating(self, obj):
         rating = models.VendorsReview.objects.filter(vendor=obj.id).aggregate(
             Avg("rating")
