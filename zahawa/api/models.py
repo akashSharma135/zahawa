@@ -60,11 +60,12 @@ class Categories(models.Model):
 
 
 class Vendors(models.Model):
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True)
+    vendor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True, related_name='vendor')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True, related_name='user')
     name = models.CharField(blank=True, null=True, max_length=100)
     image = models.ImageField(null=True, blank=True, default="media/default.png")
     description = models.TextField(blank=True, null=True, max_length=400)
-    is_favorite = models.BooleanField(default=False, null=True, blank=True)
+    is_favourite = models.BooleanField(default=False, null=True, blank=True)
     categories=models.ForeignKey(Categories,null=True,blank=True, on_delete=models.CASCADE)
     #Products=models.ForeignKey(Product,null=True,blank=True, on_delete=models.CASCADE)
     #Package=models.ForeignKey(Packages,null=True,blank=True, on_delete=models.CASCADE)
@@ -94,12 +95,14 @@ class VendorsReview(models.Model):
     description = models.CharField(max_length=250, null=True, blank=True)#change to review
 
 class Services(models.Model):
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True)
     vendors=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
     service_name = models.CharField(blank=True, null=True, max_length=100)
     service_image = models.ImageField(upload_to=None, null=True, blank=True)
-
     service_minAmount = models.PositiveIntegerField(default=0)
     service_maxAmount = models.PositiveIntegerField(default=0)
+    is_favourite = models.BooleanField(default=False, null=True, blank=True)
+    
 class ServicesReview(models.Model):
     services = models.ForeignKey(Services, on_delete=models.CASCADE)
     rating = models.FloatField(
@@ -122,10 +125,12 @@ class ChatList(models.Model):
 
 
 class Product(models.Model):
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True)
     vendors=models.ForeignKey(Vendors,null=True,blank=True, on_delete=models.CASCADE)
     product_name=models.CharField(blank=True, null=True, max_length=100)
     product_type=models.CharField(null=True, max_length=100)
     product_amount=models.PositiveIntegerField(default=0)
+    is_favourite = models.BooleanField(default=False, null=True, blank=True)
     #product_quantity=models.PositiveIntegerField(default=1)  
 
 

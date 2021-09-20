@@ -28,4 +28,9 @@ urlpatterns = [
     path("my_cart/<int:pk>/", views.MyCartView.as_view()),
     path("team_view/<int:pk>/", views.TeamView.as_view()),
     path("service_package_deatils/", views.ServicePackageView.as_view()),
+    # favourites
+    path("add_favourite/", views.AddFavourites.as_view()),
+    path("favourite_vendor/", views.FavouriteVendorView.as_view()),
+    path('favourite_products/', views.FavouriteProductView.as_view()),
+    path('favourite_services/', views.FavouriteServiceView.as_view())
 ]
