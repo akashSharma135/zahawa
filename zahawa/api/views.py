@@ -251,7 +251,7 @@ class VendorTypeView(APIView):
 # favourite vendors
 class FavouriteVendorView(APIView):
     def get(self, request):
-        objects = models.Vendors.objects.filter(user_id=request.user.id, is_favourite=True)
+        objects = models.Vendors.objects.filter(user=request.user.id, is_favourite=True)
         serializer = serializers.VendorsSerializers(objects, many=True)
         return Response(serializer.data)
 
@@ -261,6 +261,22 @@ class FavouriteProductView(APIView):
         objects = models.Product.objects.filter(user_id=request.user.id).filter(is_favourite=True)
         serializer = serializers.ProductSerializer(objects, many=True)
         return Response(serializer.data)
+
+class AddFavourites(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        if self.request.query_params.get('vendor'):
+            models.Vendors.objects.filter(pk=self.request.query_params.get('vendor')).update(is_favourite=True, user=request.user.id)
+            return Response({"msg":"Added to favourites!"}, status=status.HTTP_200_OK)
+        elif self.request.query_params.get('product'):
+            models.Product.objects.filter(pk=self.request.query_params.get('product')).update(is_favourite=True, user_id=request.user.id)
+            return Response({"msg":"Added to favourites!"}, status=status.HTTP_200_OK)
+        elif self.request.query_params.get('service'):
+            models.Services.objects.filter(pk=self.request.query_params.get('service')).update(is_favourite=True, user_id=request.user.id)
+            return Response({"msg":"Added to favourites!"}, status=status.HTTP_200_OK)
+        else: 
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 # Favourite services
 class FavouriteServiceView(APIView):

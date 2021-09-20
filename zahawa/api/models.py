@@ -60,7 +60,8 @@ class Categories(models.Model):
 
 
 class Vendors(models.Model):
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True)
+    vendor = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True, related_name='vendor')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True, related_name='user')
     name = models.CharField(blank=True, null=True, max_length=100)
     image = models.ImageField(null=True, blank=True, default="media/default.png")
     description = models.TextField(blank=True, null=True, max_length=400)
