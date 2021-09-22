@@ -290,8 +290,30 @@ class VendorListSerializer(serializers.ModelSerializer):
     def get_user_image(self, obj):
         user_images = models.CustomUser.objects.filter(id=obj.id).values_list("profile_picture",flat=True)
         return user_images
-    
 
+
+
+
+class HomeSerializer(serializers.ModelSerializer):
+    event_details = serializers.SerializerMethodField()
+    vendor_details = serializers.SerializerMethodField()
+    service_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.CustomUser
+        fields = ['name', 'loyalty_program','event_details', 'vendor_details',  'service_details']
+
+    def get_event_details(self, obj):
+        event_detail = models.Events.objects.values('id', 'event_type', 'event_image')
+        return event_detail
+
+    def get_vendor_details(self, obj):
+        vendor_detail = models.VendorsReview.objects.values('vendor__id', 'vendor__name', 'vendor__image', 'vendor__categories', 'rating')
+        return vendor_detail
+
+    def get_service_details(self, obj):
+        service_detail = models.ServicesReview.objects.values('id', 'services__service_name', 'services__service_image', 'services__vendors','services__service_minAmount', 'services__service_maxAmount', 'rating')
+        return service_detail
 
 
 

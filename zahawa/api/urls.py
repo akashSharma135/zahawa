@@ -32,5 +32,7 @@ urlpatterns = [
     path("add_favourite/", views.AddFavourites.as_view()),
     path("favourite_vendor/", views.FavouriteVendorView.as_view()),
     path('favourite_products/', views.FavouriteProductView.as_view()),
-    path('favourite_services/', views.FavouriteServiceView.as_view())
+    path('favourite_services/', views.FavouriteServiceView.as_view()),
+    # Home
+    path('home/', views.HomeView.as_view()),
 ]

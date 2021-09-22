@@ -567,3 +567,11 @@ class RoomView(APIView):
             return Response(Serializers.data)
         else:
             return Response(Serializers.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+class HomeView(APIView):
+    def get(self, request):
+        data = models.CustomUser.objects.get(pk=request.user.id)
+        serializer = serializers.HomeSerializer(data)
+       
+        return Response(serializer.data, status=status.HTTP_200_OK)
