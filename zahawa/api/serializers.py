@@ -301,7 +301,7 @@ class HomeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.CustomUser
-        fields = ['name', 'event_details', 'vendor_details',  'service_details']
+        fields = ['name', 'loyalty_program','event_details', 'vendor_details',  'service_details']
 
     def get_event_details(self, obj):
         event_detail = models.Events.objects.values('id', 'event_type', 'event_image')
