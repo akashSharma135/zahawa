@@ -19,4 +19,5 @@ admin.site.register(models.CartItem)
 admin.site.register(models.Cart)
 admin.site.register(models.Member)
 admin.site.register(models.Team)
+admin.site.register(models.ServicesReview)
 
