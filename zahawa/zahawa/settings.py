@@ -57,7 +57,17 @@ INSTALLED_APPS = [
     'django_admin_json_editor',
     'geolocation_fields',
     'crispy_forms',
+    'channels'
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -91,18 +101,27 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'zahawa.wsgi.application'
-ASGI_APPLICATION = 'zahawa.routing.application'
+# ASGI_APPLICATION = 'zahawa.routing.application'
+ASGI_APPLICATION = 'zahawa.asgi.application'
+
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'zahawa',
+#         'USER': 'cisoadmin',
+#         'PASSWORD': 'cisopassword',
+#         'HOST': 'localhost'
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'zahawa',
-        'USER': 'cisoadmin',
-        'PASSWORD': 'cisopassword',
-        'HOST': 'localhost'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
